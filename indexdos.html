@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="labApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+</head>
+
+<body>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" ng-click="toggleNav()">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">A menu</a>
+		</div>
+		<div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+			<ul class="nav navbar-nav">
+				<li><a href="#">Link 1</a></li>
+				<li><a href="#">Link 2</a></li>
+			</ul>
+		</div>
+	</nav>
+    <main class="container" ng-controller="miControlladorController">
+        <p>{{textoProcesado}}</p>
+        <div class="row">
+            <div class="col-sm-6">
+                <table class="table">
+                    <thead>
+                        <th>Nombre</th>
+                        <th><input class="form-control" ng-model="buscarApellido"></th>
+                        <th>Edad</th>
+                        <th>Coucheado</th>
+                        <th><button class="btn btn-success" ng-click="crearEmpleado = true">Crear</button></th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="empleado in empleados | filter : { apellido: buscarApellido } | limitTo: cantidad: calcularBegin()">
+                            <td>{{empleado.nombre}}</td>
+                            <td>{{empleado.apellido}}</td>
+                            <td>{{empleado.edad}}</td>
+                            <td>{{empleado.descripcion | limitarTexto: 40}}</td>
+                            <td>{{empleado.coaching | siNo }}</td>
+                            <td>
+                                <button class="btn btn-danger" type="button" ng-click="borrarEmpleado($index)">
+                                    &times;
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">{{contarCoacheados()}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <ul class="pagination">
+                                    <li>
+                                    <button ng-click="page = 1">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </button>
+                                    </li>
+                                    <li ng-repeat="page in paginas"><button>{{page}}</button></li>
+                                    <li>
+                                      <button ng-click="page = 1">
+                                        <span>&raquo;</span>
+                                      </button>
+                                    </li>
+                                  </ul>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <form class="col-sm-6" ng-if="crearEmpleado">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input class="form-control" id="nombre" ng-model="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input class="form-control" id="apellido" ng-model="apellido" required>
+                </div>
+                <div class="form-group">
+                    <label for="edad">Edad</label>
+                    <input type="number" class="form-control" id="edad" ng-model="edad" required>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="checkbox" ng-model="coaching" required>
+                        Fue coacheado
+                    </label>
+                </div>
+                <button ng-click="agregarEmpleado()" class="btn btn-primary btn-block">Guardar</button>
+            </form>
+        </div>
+    </main>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <script src="/ui-bootstrap-tpls-2.5.0.min.js"></script>
+    <script>
+        angular.module('labApp', ['ui.bootstrap'])
+        .run(function($rootScope){
+            $rootScope.isNavCollapsed = false;
+            $rootScope.toggleNav = function() {
+                $rootScope.isNavCollapsed = !$rootScope.isNavCollapsed;
+            };
+            $rootScope.texto =  'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?';
+        })
+            .controller('miControlladorController', function ($scope, $filter, $rootScope) {
+                $scope.empleados = [
+                { nombre: 'Juan1', apellido: 'Rocha', edad: 34, coaching: false, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan2', apellido: 'Perez',  edad: 54, coaching: true , descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?'},
+                    { nombre: 'Juan3', apellido: 'Gauto', edad: 64, coaching: false, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan4', apellido: 'Perez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan5', apellido: 'Perez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan6', apellido: 'Perez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan7', apellido: 'Williams', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan8', apellido: 'Perez', edad: 15, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan9', apellido: 'Perez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan10', apellido: 'Perez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan11', apellido: 'Gonzalez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan12', apellido: 'Perez', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan13', apellido: 'Vich', edad: 45, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' },
+                    { nombre: 'Juan14', apellido: 'Perez', edad: 27, coaching: true, descripcion: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis cum tenetur incidunt, doloremque eaque nemo nisi qui neque quas ullam perspiciatis aliquid similique nostrum deleniti explicabo at. Exercitationem, sed nobis?' }
+                ]
+
+                $scope.contarCoacheados = function () {
+                    var coucheados = 0;
+
+                    angular.forEach($scope.empleados, function (empleado) {
+                        if (empleado.coaching) {
+                            coucheados++;
+                        }
+                    })
+
+                    return 'Hay un total de ' + coucheados + ' coucheados de ' + $scope.empleados.length + ' empleados';
+                }
+
+                $scope.agregarEmpleado = function () {
+                    var nuevoEmpleado = {
+                        nombre: $scope.nombre,
+                        apellido: $scope.apellido,
+                        edad: $scope.edad,
+                        coaching: $scope.coaching
+                    }
+                    $scope.empleados.push(nuevoEmpleado);
+
+                    $scope.nombre = '';
+                    $scope.apellido = '';
+                    $scope.edad = '';
+                    $scope.coaching = false;
+                }
+
+                $scope.borrarEmpleado = function (indice) {
+                    $scope.empleados.splice(indice, 1);
+                }
+
+                $scope.textoProcesado = $filter('uppercase')($rootScope.texto);
+
+                $scope.cantidad = 5;
+                $scope.page = 1;
+                $scope.paginas = [];
+                const cantidadPaginas = $scope.empleados.length / $scope.cantidad;
+                const haySobrante = $scope.empleados.length % $scope.cantidad;
+                for(var i =1; i <= cantidadPaginas; i++) {
+                    $scope.paginas.push(i);
+                }
+                if(haySobrante){
+                    $scope.paginas.push($scope.paginas.length + 1);
+                }
+                $scope.calcularBegin = function(){
+                    if($scope.page == 1){
+                        return 0;
+                    }
+                    return ($scope.cantidad * $scope.page) - $scope.cantidad;
+                }
+                
+            })
+            .filter('siNo', function () {
+                return function (valor) {
+                    return valor ? 'Si' : 'No';
+                }
+            })
+            .filter('limitarTexto', function () {
+                return function(valor, limite){
+                    if(limite){
+                        return valor.substr(0, limite);
+                    }
+                    return valor.substr(0, 20);
+                }
+            });
+    </script>
+</body>
+
+</html>

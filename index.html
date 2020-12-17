@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" ng-app="miApp" class="ng-scope">
+  <head>
+    <title>Laboratorio</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+      body main div table thead th .form-control {
+        height: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+      <a class="navbar-brand" href="#">AngularJS</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Inicio <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Secciones</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Nosotros</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Versión 2.3.01</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container my-4 col-sm-10 mx-auto">
+      <h1>Lista de Empleados</h1>
+    </div>
+      <main class="container row mx-auto flex-start" ng-controller="miControlador">
+        <div class="col-sm-7 col-xs-12">
+          <table class="table">
+              <thead>
+                  <th> Nombre <input type="text" class="form-control" ng-model="buscarNombre"></th>  
+                  <th> Apellido <input type="text" class="form-control" ng-model="buscarApellido"></th>  
+                  <th> Edad <input type="text" class="form-control" ng-model="buscarEdad"></th>  
+                  <th>Coucheado <br><br><br></th>
+                  <th>Comentarios <br><br><br></th>
+              </thead>
+              <tbody>
+                  <tr ng-repeat="empleado in empleados | filter : { apellido: buscarApellido } | filter : { nombre: buscarNombre} | filter : { 
+                    edad: buscarEdad }">
+                    <td>{{empleado.nombre}}</td>
+                    <td>{{empleado.apellido}}</td>
+                    <td>{{empleado.edad}}</td>
+                    <td>{{empleado.coaching | siNo }}</td>
+                    <td>{{empleado.descripcion | limitarTexto}}</td>
+                    <td>
+                      <button class="btn btn-danger" type="button" ng-click="borrarEmpleado($index)">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+              </tbody>
+              <tfoot>
+                <td colspan="6">{{contarCoucheados()}}</td>
+              </tfoot>
+          </table>
+        </div>
+        <form class="col-sm-5 col-xs-12">
+          <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input class="form-control" id="nombre" ng-model="nombre" required>
+          </div>
+          <div class="form-group">
+              <label for="apellido">Apellido</label>
+              <input class="form-control" id="apellido" ng-model="apellido" required>
+          </div>
+          <div class="form-group">
+              <label for="edad">Edad</label>
+              <input type="number" class="form-control" id="edad" ng-model="edad" required>
+          </div>
+          <div class="form-group">
+            <label for="descripcion">Comentarios</label>
+            <input type="text" class="form-control" id="descripcion" ng-model="descripcion" required>
+        </div>
+          <div class="checkbox">
+              <label>
+                  <input type="checkbox" class="checkbox" ng-model="coaching" required>
+                  Fue coacheado
+              </label>
+          </div>
+          <button ng-click="agregarEmpleado()" class="btn btn-primary float-right">Guardar</button>
+      </form>
+  </div>
+      </main>
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+      <script>
+           angular.module("miApp", [])
+           .controller("miControlador", function($scope) {
+               $scope.empleados = [
+                   { nombre: "Juan", apellido: "Perez", edad: "28", coaching: false, descripcion: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint esse neque quod cum qui rem quia laudantium, quas consequatur. Aut velit laboriosam aliquid ratione numquam suscipit voluptatum dicta et quaerat!"},
+                   { nombre: "Jorge", apellido: "Gonzalez", edad: "36", coaching: true, descripcion: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint esse neque quod cum qui rem quia laudantium, quas consequatur. Aut velit laboriosam aliquid ratione numquam suscipit voluptatum dicta et quaerat!"},
+                   { nombre: "Esteban", apellido: "Pirez", edad: "54", coaching: false, descripcion: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint esse neque quod cum qui rem quia laudantium, quas consequatur. Aut velit laboriosam aliquid ratione numquam suscipit voluptatum dicta et quaerat!" },
+                   { nombre: "Carlos", apellido: "Paez", edad: "31", coaching: false, descripcion: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint esse neque quod cum qui rem quia laudantium, quas consequatur. Aut velit laboriosam aliquid ratione numquam suscipit voluptatum dicta et quaerat!"},
+                   { nombre: "Juana", apellido: "Pereira", edad: "24", coaching: true, descripcion: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint esse neque quod cum qui rem quia laudantium, quas consequatur. Aut velit laboriosam aliquid ratione numquam suscipit voluptatum dicta et quaerat!"}
+               ]
+            $scope.contarCoucheados = function() {
+              var coucheados = 0;
+              angular.forEach($scope.empleados, function(empleado) {
+                if (empleado.coaching){
+                  coucheados++;
+                }
+              })
+              return "Hay un total de " + coucheados + " coucheados de un total de " + $scope.empleados.length + " empleados";
+            }
+            $scope.agregarEmpleado = function() {
+              var nuevoEmpleado = {
+                nombre: $scope.nombre,
+                apellido: $scope.apellido,
+                edad: $scope.edad,
+                descripcion: $scope.descripcion,
+                coaching: $scope.coaching
+              }
+              $scope.empleados.push(nuevoEmpleado);
+
+              $scope.nombre = "";
+              $scope.apellido = "";
+              $scope.edad = "";
+              $scope.descripcion = "";
+              $scope.coaching = false;
+            }
+            $scope.borrarEmpleado = function(indice) {
+              $scope.empleados.splice(indice, 1);
+            }
+           })
+           .filter("siNo", function (){
+             return function (valor){
+               return valor ? "Si" : "No";
+             }
+           })
+           .filter("limitarTexto", function () {
+             return function(valor, limite){
+               if(limite){
+                 return valor.substring(0, limite);
+               }
+               return valor.substring(0, 10)
+             }
+           })
+      </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
